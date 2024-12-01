@@ -158,31 +158,20 @@ public class Board : MonoBehaviour
         // funcion que suspende el codigo un momento para que espere X cantidad de tiempo antes de continuar
         yield return new WaitForSeconds(0.6f);
 
-        bool foundMatches = false;  // nos permitira saber si existen matches
-        
         // Se llama el metodo para obtener los matches
         var startMatches = GetMatchByPiece(startTile.x,startTile.y,3);
         var endMatches = GetMatchByPiece(endTile.x,endTile.y,3);
 
-        // Se iteran los matches encontrados para destruir los elementos
-        startMatches.ForEach(piece => 
-        {
-            foundMatches = true;
-            DestroyPieceAt(piece.x,piece.y);
-        });
+        var matchesResult = startMatches.Union(endMatches).ToList();
 
-        endMatches.ForEach(piece => 
-        {
-            foundMatches = true;
-            DestroyPieceAt(piece.x,piece.y);
-        });
-
-        if(!foundMatches)
+        if(matchesResult.Count==0)
         {
             StartPiece.Move(startTile.x,startTile.y);
             EndPiece.Move(endTile.x,endTile.y);
             Pieces[startTile.x, startTile.y] = StartPiece;
             Pieces[endTile.x, endTile.y] = EndPiece;
+        }else{
+            DestroyPiecesByList(matchesResult);
         }
 
         startTile = null;
@@ -191,6 +180,57 @@ public class Board : MonoBehaviour
         yield return null;
     }
 
+    private void DestroyPiecesByList(List<Piece> piecesToDestroy)
+    {
+        piecesToDestroy.ForEach(piece =>{
+            DestroyPieceAt(piece.x, piece.y);
+        });
+
+        List<int> PiecesDeleted = GetColumns(piecesToDestroy);
+        List<Piece> CollapsedColumns = CollapseColumns(PiecesDeleted, 0.3f);
+    }
+
+    private List<Piece> CollapseColumns(List<int> columns, float timeToCollapse)
+    {
+        List<Piece> movingPieces = new List<Piece>();
+        for (int i = 0; i < columns.Count; i++)
+        {
+            var column = columns[i];
+            for (int y = 0; y < height; y++)
+            {
+                if(Pieces[column,y] == null)
+                {
+                    for (int yPlus = y+1; yPlus < height; yPlus++)
+                    {
+                        if (Pieces[column,yPlus] != null)
+                        {
+                            Pieces[column,yPlus].Move(column,y);
+                            Pieces[column,y] = Pieces[column,yPlus];
+                            if(!movingPieces.Contains(Pieces[column,y])){
+                                movingPieces.Add(Pieces[column,y]);
+                            }
+                            Pieces[column,yPlus] = null;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return movingPieces;
+    }
+
+    private List<int> GetColumns(List<Piece> piecesToDestroy)
+    {
+        var result = new List<int>();
+        piecesToDestroy.ForEach(piece =>
+        {
+            if (!result.Contains(piece.x))
+            {
+                result.Add(piece.x);
+            }
+        });
+        return result;
+    }
 
     // Metodo para saber si el elemento que se desea mover está a 1 casilla, no aplican diagonales
     public bool IsCloseTo(Tile start, Tile end)
