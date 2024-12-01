@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -125,18 +126,99 @@ public class Board : MonoBehaviour
         Pieces[endTile.x,endTile.y] = StartPiece;
     }
 
+
+    // Metodo para saber si el elemento que se desea mover está a 1 casilla, no aplican diagonales
     public bool IsCloseTo(Tile start, Tile end)
     {
+        // Busca si la diferencia entre las posiciones X es 1
+        // Busca tambien si la posición en y de la casilla a mover Y a donde será movida es la misma
         if(Math.Abs((start.x-end.x)) == 1 && start.y == end.y)
         {
             return true;
         }
 
+        // Busca si la diferencia entre las posiciones Y es 1
+        // Busca tambien si la posición en y de la casilla a mover X a donde será movida es la misma
         if(Math.Abs((start.y-end.y)) == 1 && start.x == end.x)
         {
             return true;
         }
 
         return false;
+    }
+
+    // Metodo para buscar match de elementos en base a la dirección
+    public List<Piece> GetMatchByDirection(int xPos, int yPos, Vector2 direction, int matchPieces = 3)
+    {
+        List<Piece> matches = new List<Piece>();    // Se define un listado de elementos tipo Piece
+        Piece startPiece = Pieces[xPos,yPos];   // Se define la posición inicial en base a las coordenadas
+        matches.Add(startPiece);    // Se agrega la posición inicial al listado tipo Piece
+
+        // Se crean las variables que almacenarán las próximas posiciones
+        int nextX;
+        int nextY;
+
+        // Se otorga el valor maximo dependiendo si es mas alto o mas ancho el elemento board
+        int maxVal = width > height ? width : height;
+
+        // Se iteran las siguientes posiciones siempre y cuando sean menores a el valor maximo
+        for (int i = 1; i < maxVal; i++)
+        {
+            // Se obtienes las siguientes posiciones
+            nextX = xPos + ((int)direction.x * i);
+            nextY = yPos + ((int)direction.y * i);
+
+            // Valida que la proxima posicion no salga del maximo de altura, ni de anchura
+            if(nextX >= 0 && nextX < width && nextY >= 0 && nextY < height)
+            {
+                // Vamos a revisar si la proxima posicion tiene el mismo tipo que la pieza inicial
+                var nextPiece = Pieces[nextX,nextY];
+                if(nextPiece != null && nextPiece.pieceType == startPiece.pieceType){
+                    matches.Add(nextPiece); 
+                }else{
+                    break;
+                }
+            }
+        }
+        if (matches.Count >= matchPieces)
+        {
+            return matches;
+        }else{
+            return null;
+        }
+    }
+
+    // Metodo para encontrar los matches en todas las direcciones (up,down,left,right)
+    public List<Piece> GetMatchByPiece(int xPos, int yPos, int matchPieces=3)
+    {
+        // Se obtienen los matches en cada dirección
+        var upMatches = GetMatchByDirection(xPos, yPos, new Vector2(0,1), 2);
+        var downMatches = GetMatchByDirection(xPos, yPos, new Vector2(0,-1), 2);
+        var rightMatches = GetMatchByDirection(xPos, yPos, new Vector2(1,0), 2);
+        var leftMatches = GetMatchByDirection(xPos, yPos, new Vector2(-1,0), 2);
+
+        // Se valida que no hayamos obtenido ningun listado nulo, en caso de que si, se deja vacío
+        if(upMatches == null) upMatches = new List<Piece>();
+        if(downMatches == null) downMatches = new List<Piece>();
+        if(rightMatches == null) rightMatches = new List<Piece>();
+        if(leftMatches == null) leftMatches = new List<Piece>();
+
+        // Se suman la cantidad de matches encontrados en cada dirección
+        var verticalMatches = upMatches.Union(downMatches).ToList();
+        var horizontalMatches = rightMatches.Union(leftMatches).ToList();
+
+        // Se crea el listado de match encontrados
+        var foundedMatches = new List<Piece>();
+        // Se suman los matches verticales y horizontales si encontró la cantidad minima o más
+        if (verticalMatches.Count>= matchPieces)
+        {
+            foundedMatches = foundedMatches.Union(verticalMatches).ToList();
+        }
+        if (horizontalMatches.Count>= matchPieces)
+        {
+            foundedMatches = foundedMatches.Union(horizontalMatches).ToList();
+        }
+
+        return foundedMatches;
     }
 }
