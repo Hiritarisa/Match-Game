@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -23,6 +24,9 @@ public class Board : MonoBehaviour
     // Se crean variables para almacenar las coordenadas de los elementos clickeados
     Tile startTile;
     Tile endTile;
+
+    // Se crea una variable para detectar si ya finalizamosl a busqueda de matches y permitir mover nuevamente elementos
+    bool allowMovement = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -102,14 +106,13 @@ public class Board : MonoBehaviour
     {
         if(startTile != null && endTile != null && IsCloseTo(startTile,endTile))
         {
-            SwapTiles();
+            StartCoroutine(SwapTiles());
         }
-        startTile = null;
-        endTile = null;
     }
 
     // funcion que se encarga de actualizar las coordenadas de los elementos intercambiados
-    private void SwapTiles()
+    // Se crea de tipo IEnumerator para que sea sincrono
+    IEnumerator SwapTiles()
     {
         // Se obtiene la pieza inicial
         var StartPiece = Pieces[startTile.x,startTile.y];
@@ -124,6 +127,43 @@ public class Board : MonoBehaviour
         // Se actualiza el sistema de coordenadas
         Pieces[startTile.x,startTile.y] = EndPiece;
         Pieces[endTile.x,endTile.y] = StartPiece;
+
+        // funcion que suspende el codigo un momento para que espere X cantidad de tiempo antes de continuar
+        yield return new WaitForSeconds(0.6f);
+
+        bool foundMatches = false;  // nos permitira saber si existen matches
+        
+        // Se llama el metodo para obtener los matches
+        var startMatches = GetMatchByPiece(startTile.x,startTile.y,3);
+        var endMatches = GetMatchByPiece(endTile.x,endTile.y,3);
+
+        // Se iteran los matches encontrados para destruir los elementos
+        startMatches.ForEach(piece => 
+        {
+            foundMatches = true;
+            Pieces[piece.x, piece.y] = null;
+            Destroy(piece.gameObject);
+        });
+
+        endMatches.ForEach(piece => 
+        {
+            foundMatches = true;
+            Pieces[piece.x, piece.y] = null;
+            Destroy(piece.gameObject);
+        });
+
+        if(!foundMatches)
+        {
+            StartPiece.Move(startTile.x,startTile.y);
+            EndPiece.Move(endTile.x,endTile.y);
+            Pieces[startTile.x, startTile.y] = StartPiece;
+            Pieces[endTile.x, endTile.y] = EndPiece;
+        }
+
+        startTile = null;
+        endTile = null;
+        allowMovement = false;
+        yield return null;
     }
 
 
