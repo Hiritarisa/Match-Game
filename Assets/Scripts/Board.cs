@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -40,20 +41,46 @@ public class Board : MonoBehaviour
 
     private void SetupPieces()
     {
+        int maxTries = 50;
+        int currentTry = 0;
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++)
             {
-                var selectedPiece = availablePieces[UnityEngine.Random.Range(0,availablePieces.Length)];
-
-                // Metodo que instancia el selectedPiece definido aleatoriamnente para llenar la cuadricula
-                var o = Instantiate(selectedPiece, new Vector3(x,y,-5), Quaternion.identity);
-                o.transform.parent = transform;
-
-                // se accede al componente de tipo Pieces del objeto instanciado
-                Pieces[x,y] = o.GetComponent<Piece>();
-                Pieces[x,y]?.Setup(x, y, this);
+                currentTry = 0;
+                var newPiece = CreatePieceAt(x, y);
+                while(validateMatchesInCreation(x, y))
+                {
+                    DestroyPieceAt(x,y);
+                    newPiece = (CreatePieceAt(x,y));
+                    currentTry++;
+                    if (currentTry > maxTries)
+                    {
+                        break;
+                    }
+                }
             }
         }
+    }
+
+    private void DestroyPieceAt(int x, int y)
+    {
+        var PieceToClear = Pieces[x,y];
+        Destroy(PieceToClear.gameObject);
+        Pieces[x, y] = null;
+    }
+
+    public Piece CreatePieceAt(int x, int y)
+    {
+        var selectedPiece = availablePieces[UnityEngine.Random.Range(0,availablePieces.Length)];
+
+        // Metodo que instancia el selectedPiece definido aleatoriamnente para llenar la cuadricula
+        var o = Instantiate(selectedPiece, new Vector3(x,y,-5), Quaternion.identity);
+        o.transform.parent = transform;
+
+        // se accede al componente de tipo Pieces del objeto instanciado
+        Pieces[x,y] = o.GetComponent<Piece>();
+        Pieces[x,y]?.Setup(x, y, this);
+        return Pieces[x,y];
     }
 
     private void PositionCamera()
@@ -141,15 +168,13 @@ public class Board : MonoBehaviour
         startMatches.ForEach(piece => 
         {
             foundMatches = true;
-            Pieces[piece.x, piece.y] = null;
-            Destroy(piece.gameObject);
+            DestroyPieceAt(piece.x,piece.y);
         });
 
         endMatches.ForEach(piece => 
         {
             foundMatches = true;
-            Pieces[piece.x, piece.y] = null;
-            Destroy(piece.gameObject);
+            DestroyPieceAt(piece.x,piece.y);
         });
 
         if(!foundMatches)
@@ -185,6 +210,17 @@ public class Board : MonoBehaviour
         }
 
         return false;
+    }
+
+    bool validateMatchesInCreation(int xPos, int yPos)
+    {
+        var downMatches = GetMatchByDirection(xPos,yPos, new Vector2(0,-1),2);
+        var leftMatches = GetMatchByDirection(xPos,yPos, new Vector2(-1,0),2);
+
+        if (downMatches == null) downMatches = new List<Piece>();
+        if (leftMatches == null) leftMatches = new List<Piece>();
+
+        return (downMatches.Count>0 || leftMatches.Count > 0);
     }
 
     // Metodo para buscar match de elementos en base a la dirección
