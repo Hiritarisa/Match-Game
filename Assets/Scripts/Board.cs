@@ -70,7 +70,7 @@ public class Board : MonoBehaviour
     private void DestroyPieceAt(int x, int y)
     {
         var PieceToClear = Pieces[x,y];
-        Destroy(PieceToClear.gameObject);
+        PieceToClear.removePiece(true); // Se llama la nueva funcion creada para eliminar de forma animada
         Pieces[x, y] = null;
     }
 
@@ -79,12 +79,13 @@ public class Board : MonoBehaviour
         var selectedPiece = availablePieces[UnityEngine.Random.Range(0,availablePieces.Length)];
 
         // Metodo que instancia el selectedPiece definido aleatoriamnente para llenar la cuadricula
-        var o = Instantiate(selectedPiece, new Vector3(x,y,-5), Quaternion.identity);
+        var o = Instantiate(selectedPiece, new Vector3(x,y+1,-5), Quaternion.identity);
         o.transform.parent = transform;
 
         // se accede al componente de tipo Pieces del objeto instanciado
         Pieces[x,y] = o.GetComponent<Piece>();
         Pieces[x,y]?.Setup(x, y, this);
+        Pieces[x,y]?.Move(x, y);
         return Pieces[x,y];
     }
 
