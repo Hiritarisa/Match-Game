@@ -11,6 +11,7 @@ using UnityEngine.UIElements;
 
 public class Board : MonoBehaviour
 {
+    public float timeBetweenPieces = 0.05f;
     public int width; // ancho de la pantalla
     public int height; // alto de la pantalla
     public GameObject tileObject; // define un elemento tileObject para su uso en Unity
@@ -27,7 +28,7 @@ public class Board : MonoBehaviour
     Tile endTile;
 
     // Se crea una variable para detectar si ya finalizamosl a busqueda de matches y permitir mover nuevamente elementos
-    bool allowMovement = false;
+    bool allowMovement = true;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,30 +37,34 @@ public class Board : MonoBehaviour
         Pieces = new Piece [width,height];
         SetupBoard();
         PositionCamera();
-        SetupPieces();
+        StartCoroutine(SetupPieces());
     }
 
-    private void SetupPieces()
+    private IEnumerator SetupPieces()
     {
         int maxTries = 50;
         int currentTry = 0;
         for (int x = 0; x < width; x++){
             for (int y = 0; y < height; y++)
             {
-                currentTry = 0;
-                var newPiece = CreatePieceAt(x, y);
-                while(validateMatchesInCreation(x, y))
-                {
-                    DestroyPieceAt(x,y);
-                    newPiece = (CreatePieceAt(x,y));
-                    currentTry++;
-                    if (currentTry > maxTries)
+                yield return new WaitForSeconds(timeBetweenPieces);
+                if(Pieces[x,y] == null){
+                    currentTry = 0;
+                    var newPiece = CreatePieceAt(x, y);
+                    while(validateMatchesInCreation(x, y))
                     {
-                        break;
+                        DestroyPieceAt(x,y);
+                        newPiece = (CreatePieceAt(x,y));
+                        currentTry++;
+                        if (currentTry > maxTries)
+                        {
+                            break;
+                        }
                     }
                 }
             }
         }
+        yield return null;
     }
 
     private void DestroyPieceAt(int x, int y)
@@ -119,19 +124,25 @@ public class Board : MonoBehaviour
     // funcion para recibir el espacio inicial que fue clickeado
     public void TileDown(Tile tile_)
     {
-        startTile = tile_;
+        if (allowMovement)
+        {
+            startTile = tile_;
+        }
     }
 
     // funcion para recibir la posición final del arrastrado del elemento
     public void TileOver(Tile tile_)
     {
-        endTile = tile_;
+        if (allowMovement)
+        {
+            endTile = tile_;
+        }
     }
 
     // funcion para validar si se modificó la posicion del elemento clickeado con otro
     public void TileUp(Tile tile_)
     {
-        if(startTile != null && endTile != null && IsCloseTo(startTile,endTile))
+        if(allowMovement && startTile != null && endTile != null && IsCloseTo(startTile,endTile))
         {
             StartCoroutine(SwapTiles());
         }
@@ -141,6 +152,7 @@ public class Board : MonoBehaviour
     // Se crea de tipo IEnumerator para que sea sincrono
     IEnumerator SwapTiles()
     {
+        allowMovement = false;
         // Se obtiene la pieza inicial
         var StartPiece = Pieces[startTile.x,startTile.y];
         
@@ -212,6 +224,10 @@ public class Board : MonoBehaviour
         if(newMatches.Count>0){
             var newCollapsedPieces = CollapseColumns(GetColumns(newMatches), 0.3f);
             FindMatchsRecusirvelyCoroutine(newCollapsedPieces);
+        }else{
+            yield return new WaitForSeconds(0.1f);
+            StartCoroutine(SetupPieces());
+            allowMovement = true;
         }
         yield return null;
     }
