@@ -188,6 +188,32 @@ public class Board : MonoBehaviour
 
         List<int> PiecesDeleted = GetColumns(piecesToDestroy);
         List<Piece> CollapsedColumns = CollapseColumns(PiecesDeleted, 0.3f);
+        FindMatchsRecusirvely(CollapsedColumns);
+    }
+
+    private void FindMatchsRecusirvely(List<Piece> collapsedPieces)
+    {
+        StartCoroutine(FindMatchsRecusirvelyCoroutine(collapsedPieces));
+    }
+
+    IEnumerator FindMatchsRecusirvelyCoroutine(List<Piece> collapsedPieces)
+    {
+        yield return new WaitForSeconds(1f);
+        List<Piece> newMatches = new List<Piece>();
+        collapsedPieces.ForEach(piece =>
+        {
+            var matches = GetMatchByPiece(piece.x, piece.y,3);
+            if (matches != null)
+            {
+                newMatches = newMatches.Union(matches).ToList();
+                DestroyPiecesByList(matches);
+            }
+        });
+        if(newMatches.Count>0){
+            var newCollapsedPieces = CollapseColumns(GetColumns(newMatches), 0.3f);
+            FindMatchsRecusirvelyCoroutine(newCollapsedPieces);
+        }
+        yield return null;
     }
 
     private List<Piece> CollapseColumns(List<int> columns, float timeToCollapse)
