@@ -142,9 +142,11 @@ public class Board : MonoBehaviour
     // funcion para validar si se modificó la posicion del elemento clickeado con otro
     public void TileUp(Tile tile_)
     {
-        if(allowMovement && startTile != null && endTile != null && IsCloseTo(startTile,endTile))
-        {
-            StartCoroutine(SwapTiles());
+        if(allowMovement){
+            if(startTile != null && endTile != null && IsCloseTo(startTile,endTile))
+            {
+                StartCoroutine(SwapTiles());
+            }
         }
     }
 
@@ -188,7 +190,7 @@ public class Board : MonoBehaviour
 
         startTile = null;
         endTile = null;
-        allowMovement = false;
+        allowMovement = true;
         yield return null;
     }
 
@@ -199,8 +201,8 @@ public class Board : MonoBehaviour
         });
 
         List<int> PiecesDeleted = GetColumns(piecesToDestroy);
-        List<Piece> CollapsedColumns = CollapseColumns(PiecesDeleted, 0.3f);
-        FindMatchsRecusirvely(CollapsedColumns);
+        List<Piece> collapsedPieces = CollapseColumns(PiecesDeleted, 0.3f);
+        FindMatchsRecusirvely(collapsedPieces);
     }
 
     private void FindMatchsRecusirvely(List<Piece> collapsedPieces)
@@ -214,7 +216,7 @@ public class Board : MonoBehaviour
         List<Piece> newMatches = new List<Piece>();
         collapsedPieces.ForEach(piece =>
         {
-            var matches = GetMatchByPiece(piece.x, piece.y,3);
+            var matches = GetMatchByPiece(piece.x, piece.y, 3);
             if (matches != null)
             {
                 newMatches = newMatches.Union(matches).ToList();
@@ -248,7 +250,8 @@ public class Board : MonoBehaviour
                         {
                             Pieces[column,yPlus].Move(column,y);
                             Pieces[column,y] = Pieces[column,yPlus];
-                            if(!movingPieces.Contains(Pieces[column,y])){
+                            if(!movingPieces.Contains(Pieces[column,y]))
+                            {
                                 movingPieces.Add(Pieces[column,y]);
                             }
                             Pieces[column,yPlus] = null;
@@ -290,7 +293,6 @@ public class Board : MonoBehaviour
         {
             return true;
         }
-
         return false;
     }
 
@@ -332,7 +334,7 @@ public class Board : MonoBehaviour
                 // Vamos a revisar si la proxima posicion tiene el mismo tipo que la pieza inicial
                 var nextPiece = Pieces[nextX,nextY];
                 if(nextPiece != null && nextPiece.pieceType == startPiece.pieceType){
-                    matches.Add(nextPiece); 
+                matches.Add(nextPiece); 
                 }else{
                     break;
                 }
