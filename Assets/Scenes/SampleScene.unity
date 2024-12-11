@@ -376,16 +376,12 @@ MonoBehaviour:
   cameraSizeOffset: 0
   cameraVerticalOffset: 0
   availablePieces:
-  - {fileID: 7842102331177856687, guid: 7edc9d9e895e24a508b8b7bac8a421fa, type: 3}
-  - {fileID: 4089209113886189281, guid: a910bd34b85a24cdaa52da78be50ec33, type: 3}
   - {fileID: 3539652006729610579, guid: e64c6fb1b0716429d9debdb1901549e1, type: 3}
   - {fileID: 3759866310385100774, guid: 8046ed34196f94f7c9ec68e545e59ff4, type: 3}
   - {fileID: 7018797644327770138, guid: c043347bad4844661ba899e61cfe458d, type: 3}
   - {fileID: 6208794501878917770, guid: a2ede44e539c14cd0bb3c726c2d46dae, type: 3}
   - {fileID: 3231905410496680214, guid: 15561a39869ba412ab4542b149eb0727, type: 3}
   - {fileID: 6615017030393584133, guid: 41af6ee89c6df401b9909af086762d00, type: 3}
-  - {fileID: 9167574877540197445, guid: d293f665e958e44d4a4108cdceea6f94, type: 3}
-  - {fileID: 8839775094125387518, guid: c2b926c6153c247d49b6d6de75a5324f, type: 3}
 --- !u!4 &1070981453
 Transform:
   m_ObjectHideFlags: 0
