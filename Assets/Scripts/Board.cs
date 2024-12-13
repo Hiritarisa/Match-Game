@@ -17,6 +17,7 @@ public class Board : MonoBehaviour
     public GameObject tileObject; // define un elemento tileObject para su uso en Unity
     public float cameraSizeOffset; // Nos permitira añadir un numero al tamaño ortografico final que tenga la camara
     public float cameraVerticalOffset; // Nos permitirá añadir un valor a la posicion en vertical de la camara
+    public int PointsPerMatch; // Variable que contendra los puntos por Matches
     public GameObject[] availablePieces; // Array de GameObjects para definir las piezas disponibles a ser creadas en la cuadricula
 
     // Se crean arrays de dos dimensiones (x,y) con el fin de poder encontrar por medio de dos indices la posicion de los objetos
@@ -187,6 +188,7 @@ public class Board : MonoBehaviour
             Pieces[endTile.x, endTile.y] = EndPiece;
         }else{
             DestroyPiecesByList(matchesResult);
+            AwardPoints(matchesResult);
         }
 
         startTile = null;
@@ -222,6 +224,7 @@ public class Board : MonoBehaviour
             {
                 newMatches = newMatches.Union(matches).ToList();
                 DestroyPiecesByList(matches);
+                AwardPoints(matches);
             }
         });
         if(newMatches.Count>0){
@@ -381,5 +384,13 @@ public class Board : MonoBehaviour
         }
 
         return foundedMatches;
+    }
+
+
+    // Funcion que suma puntos.
+    // Opera por medio de Instanciar el GameManager
+    public void AwardPoints(List<Piece> allMatches)
+    {
+        GameManager.Instance.AddPoint(allMatches.Count * PointsPerMatch);
     }
 }
