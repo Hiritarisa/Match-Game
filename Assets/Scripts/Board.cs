@@ -126,7 +126,8 @@ public class Board : MonoBehaviour
     // funcion para recibir el espacio inicial que fue clickeado
     public void TileDown(Tile tile_)
     {
-        if (allowMovement)
+        // Se valida que este permitido mover las fichas y que el estado de la partida sea 'en juego'
+        if (allowMovement && GameManager.Instance.gameState == GameManager.GameState.InGame)
         {
             startTile = tile_;
         }
@@ -135,7 +136,8 @@ public class Board : MonoBehaviour
     // funcion para recibir la posición final del arrastrado del elemento
     public void TileOver(Tile tile_)
     {
-        if (allowMovement)
+        // Se valida que este permitido mover las fichas y que el estado de la partida sea 'en juego'
+        if (allowMovement && GameManager.Instance.gameState == GameManager.GameState.InGame)
         {
             endTile = tile_;
         }
@@ -144,7 +146,8 @@ public class Board : MonoBehaviour
     // funcion para validar si se modificó la posicion del elemento clickeado con otro
     public void TileUp(Tile tile_)
     {
-        if(allowMovement){
+        // Se valida que este permitido mover las fichas y que el estado de la partida sea 'en juego'
+        if(allowMovement && GameManager.Instance.gameState == GameManager.GameState.InGame){
             if(startTile != null && endTile != null && IsCloseTo(startTile,endTile))
             {
                 StartCoroutine(SwapTiles());

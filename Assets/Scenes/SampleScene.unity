@@ -373,6 +373,9 @@ MonoBehaviour:
   onPointsUpdated:
     m_PersistentCalls:
       m_Calls: []
+  timeOut: 10
+  currentTime: 0
+  gameState: 1
 --- !u!4 &879117361
 Transform:
   m_ObjectHideFlags: 0
