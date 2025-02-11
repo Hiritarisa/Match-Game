@@ -810,6 +810,9 @@ MonoBehaviour:
   onPointsUpdated:
     m_PersistentCalls:
       m_Calls: []
+  OnGameStateUpdated:
+    m_PersistentCalls:
+      m_Calls: []
   timeOut: 10
   currentTime: 0
   gameState: 1
@@ -1151,7 +1154,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1078987596}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2046974991}
+        m_TargetAssemblyTypeName: UIGameOver, Assembly-CSharp
+        m_MethodName: ExitGameBtnClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1078987596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1662,7 +1677,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1772239867}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2046974991}
+        m_TargetAssemblyTypeName: UIGameOver, Assembly-CSharp
+        m_MethodName: PlayAgainBtnClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1772239867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1787,6 +1814,8 @@ GameObject:
   - component: {fileID: 2046974987}
   - component: {fileID: 2046974989}
   - component: {fileID: 2046974988}
+  - component: {fileID: 2046974990}
+  - component: {fileID: 2046974991}
   m_Layer: 5
   m_Name: UIGameOver
   m_TagString: Untagged
@@ -1852,6 +1881,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2046974986}
   m_CullTransparentMesh: 1
+--- !u!114 &2046974990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046974986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b02fbd078e4404d26a292826fea7dacd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  containerRect: {fileID: 968768026}
+  containerCanvas: {fileID: 968768027}
+  background: {fileID: 2046974988}
+  visibleState: 2
+  transitionTime: 1.2
+--- !u!114 &2046974991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046974986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a96fd37930f14866b6f8e0329c24da4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  displayedPoints: 0
+  pointsUI: {fileID: 703102920}
 --- !u!1 &2089224365
 GameObject:
   m_ObjectHideFlags: 0

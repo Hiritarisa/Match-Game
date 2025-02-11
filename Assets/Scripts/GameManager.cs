@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     // Se inicializa un nuevo evento para cuando aumenten los puntos pueda "avisar" a los demas componentes
     public UnityEvent onPointsUpdated;
 
+    // Evento para actualizar el estado del juego
+    public UnityEvent<GameState> OnGameStateUpdated;
+
     // Variables encargadas del tiempo de juego
     public float timeOut = 10f;
     public float currentTime = 0f;
@@ -52,6 +55,7 @@ public class GameManager : MonoBehaviour
             if(currentTime > timeOut)
             {
                 gameState = GameState.GameOver;
+                OnGameStateUpdated?.Invoke(gameState);
             }
         }
     }
@@ -62,5 +66,16 @@ public class GameManager : MonoBehaviour
         Points += newPoints; // Suma puntos
         onPointsUpdated?.Invoke(); // 
         currentTime = 0f; // reinicia el contador del tiempo para hacer match
+    }
+
+    public void RestartGame(){
+        Points = 0;
+        gameState = GameState.InGame;
+        OnGameStateUpdated?.Invoke(gameState);
+        currentTime = 0f;
+    }
+
+    public void ExitGame(){
+
     }
 }
