@@ -340,7 +340,7 @@ public class Board : MonoBehaviour
         if (downMatches == null) downMatches = new List<Piece>();
         if (leftMatches == null) leftMatches = new List<Piece>();
 
-        return (downMatches.Count>0 || leftMatches.Count > 0);
+        return downMatches.Count>0 || leftMatches.Count > 0;
     }
 
     // Metodo para buscar match de elementos en base a la dirección

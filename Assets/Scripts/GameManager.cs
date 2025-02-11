@@ -68,6 +68,13 @@ public class GameManager : MonoBehaviour
         currentTime = 0f; // reinicia el contador del tiempo para hacer match
     }
 
+    public void StartGame(){
+        gameState = GameState.InGame;
+        OnGameStateUpdated?.Invoke(gameState);
+        currentTime = 0;
+        Points = 0;
+    }
+
     public void RestartGame(){
         Points = 0;
         gameState = GameState.InGame;
@@ -76,6 +83,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void ExitGame(){
-
+        gameState = GameState.Idle;
+        Points = 0;
+        OnGameStateUpdated?.Invoke(gameState);
     }
 }
