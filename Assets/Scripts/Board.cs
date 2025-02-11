@@ -38,7 +38,24 @@ public class Board : MonoBehaviour
         Pieces = new Piece [width,height];
         SetupBoard();
         PositionCamera();
-        StartCoroutine(SetupPieces());
+        if(GameManager.Instance.gameState == GameManager.GameState.InGame){
+            StartCoroutine(SetupPieces());
+        }
+        GameManager.Instance.OnGameStateUpdated.AddListener(OnGameStateUpdated); // se 'suscribe' al elemento
+    }
+
+    private void OnDestroy() {
+        GameManager.Instance.OnGameStateUpdated.RemoveListener(OnGameStateUpdated); // elimina la 'suscripcion' del elemento
+    }
+
+    private void OnGameStateUpdated(GameManager.GameState newState)
+    {
+        if(newState == GameManager.GameState.InGame){
+            StartCoroutine(SetupPieces());
+        }
+        if(newState == GameManager.GameState.GameOver){
+            ClearAllPieces();
+        }
     }
 
     private IEnumerator SetupPieces()
@@ -73,6 +90,16 @@ public class Board : MonoBehaviour
         var PieceToClear = Pieces[x,y];
         PieceToClear.removePiece(true); // Se llama la nueva funcion creada para eliminar de forma animada
         Pieces[x, y] = null;
+    }
+
+    private void ClearAllPieces()
+    {
+        for(int x = 0; x<width; x++){
+            for (int y = 0; y < height; y++)
+            {
+                DestroyPieceAt(x,y);
+            }
+        }
     }
 
     public Piece CreatePieceAt(int x, int y)

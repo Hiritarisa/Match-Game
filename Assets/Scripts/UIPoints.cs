@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System;
 
 public class UIPoints : MonoBehaviour
 {
@@ -12,6 +13,20 @@ public class UIPoints : MonoBehaviour
     {
         // Se crea un listener para la funcion onPointsUpdate del Game manager
         GameManager.Instance.onPointsUpdated.AddListener(updatePoints);
+        GameManager.Instance.OnGameStateUpdated.AddListener(GameStateUpdated);
+    }
+
+    private void OnDestroy() {
+        GameManager.Instance.onPointsUpdated.RemoveListener(updatePoints);
+        GameManager.Instance.OnGameStateUpdated.RemoveListener(GameStateUpdated);
+    }
+
+    private void GameStateUpdated(GameManager.GameState newState)
+    {
+        if(newState == GameManager.GameState.GameOver){
+            displayedPoints = 0;
+            pointsLabel.text = displayedPoints.ToString();
+        }
     }
 
     // Se crea la funcion que llamara una coroutine la cual actualizara los puntos secuencialmente y no de inmediato
