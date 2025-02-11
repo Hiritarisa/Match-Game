@@ -194,6 +194,7 @@ public class Board : MonoBehaviour
         var EndPiece = Pieces[endTile.x,endTile.y];
 
         // Se mueven ambas piezas
+        AudioManager.Instance.Move();
         StartPiece.Move(endTile.x,endTile.y);
         EndPiece.Move(startTile.x,startTile.y);
 
@@ -212,6 +213,7 @@ public class Board : MonoBehaviour
 
         if(matchesResult.Count==0)
         {
+            AudioManager.Instance.Miss();
             StartPiece.Move(startTile.x,startTile.y);
             EndPiece.Move(endTile.x,endTile.y);
             Pieces[startTile.x, startTile.y] = StartPiece;
